@@ -1,8 +1,11 @@
 As a lemonade stand owner, I want to be given a report of the current day's 
 weather forecast, so I can determine how much I want to/can sell today.
 
-As a lemonade stand owner, I want to control the number of glasses to make, 
-the number of advertising signs, and the cost of the lemonade today.
+As a lemonade stand owner, I want to control how many of each supplies I want
+that day, so I can save resources.
+
+As a lemonade stand owner, I want to control the prices of lemonade each day so
+I can make more profit on hotter days.
 
 As a lemonade stand owner, I want a financial report so I can know if I made
 a profit or not.
