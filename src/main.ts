@@ -1,65 +1,40 @@
-import { Inventory } from "./inventory";
-import type { Supplies, SupplyName } from "./types";
+import { LemonadeStand } from "./stand.js";
+import { Market } from "./market.js";
+import { weatherType, demandFor } from "./weather.js";
+import { askInteger, askYesNo, pause, closeInput } from "./input.js";
+import { showIntro, showMorning, showReport } from "./display.js";
+import { SUPPLY_NAMES } from "./types.js";
 
-function roundToCents(x: number): number {
-  return Math.round(x * 100) / 100;
-}
+async function main(): Promise<void> {
+  const stand = new LemonadeStand(20);
+  const market = new Market();
 
-export class LemonadeStand {
-  private _cash: number;
-  readonly inventory = new Inventory();
-  // Public and mutable so the recipe can change over time
-  recipe: Supplies = { cups: 1, ice: 2, lemons: 0.25, sugar: 0.25 };
-  pricePerCup = 0.5;
+  showIntro(stand.cash);
+  await pause("Press Enter to start: ");
 
-  constructor(startingCash: number) {
-    this._cash = startingCash;
-  }
+  let day = 1;
+  while (true) {
+    const weather = weatherType();
+    const prices = market.newPrices();
+    showMorning(day, weather, prices, stand.cash, stand.inventory.snapshot());
 
-  get cash(): number {
-    return this._cash;
-  }
-
-  // Returns false (and changes nothing) if the player can't afford it
-  buy(item: SupplyName, amount: number, unitPrice: number): boolean {
-    const cost = roundToCents(amount * unitPrice);
-    if (cost > this._cash) return false;
-    this._cash = roundToCents(this._cash - cost);
-    this.inventory.add(item, amount);
-    return true;
-  }
-
-  // Sells as many cups as demand AND supplies allow. Returns cups sold.
-    simulateDay(demand: number): number {
-        const sold = Math.min(demand, this.inventory.maxCups(this.recipe));
-        this.inventory.consume(this.recipe, sold);
-        this._cash = roundToCents(this._cash + sold * this.pricePerCup);
-        return sold;
+    for (const name of SUPPLY_NAMES) {
+      while (true) {
+        const amount = await askInteger(`How many ${name} to buy? `);
+        if (stand.buy(name, amount, prices[name])) break;
+        console.log(`You can't afford that! You only have $${stand.cash.toFixed(2)}.`);
+      }
     }
+
+    const cupsSold = stand.simulateDay(demandFor(weather));
+    showReport(cupsSold, stand.cash, stand.inventory.snapshot());
+
+    if (!(await askYesNo("\nPlay another day? (y/n) "))) break;
+    day++;
+  }
+
+  console.log(`Thanks for playing! You finished with $${stand.cash.toFixed(2)}.`);
+  closeInput();
 }
 
-export function showMorning(
-  day: number,
-  weather: Weather,
-  prices: Prices,
-  cash: number,
-  inventory: Supplies
-): void {
-  console.log(`\n--- Day ${day} ---`);
-  console.log(`Weather: ${weather}`);
-  console.log(`Cash: ${money(cash)}`);
-  console.log("Today's prices (and what you already have):");
-  for (const name of SUPPLY_NAMES) {
-    console.log(`  ${name}: ${money(prices[name])} each (you have ${inventory[name]})`);
-  }
-}
- 
-export function showReport(cupsSold: number, cash: number, left: Supplies): void {
-  console.log("\n--- End of day ---");
-  console.log(`Cups sold: ${cupsSold}`);
-  console.log(`Cash: ${money(cash)}`);
-  console.log("Supplies left:");
-  for (const name of SUPPLY_NAMES) {
-    console.log(`  ${name}: ${left[name]}`);
-  }
-}
+main();
