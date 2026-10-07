@@ -1,23 +1,13 @@
 export type Weather = "sunny" | "cloudy" | "rainy" | "hot";
 
-// What persists between days
-export interface GameState {
-  day: number;
-  cash: number;
-  cupsInStock: number;
+export interface Supplies {
+  cups: number;
+  ice: number;
+  lemons: number;
+  sugar: number;
 }
+export type SupplyName = keyof Supplies;
+//each num is price, same items used
+export type Price = Record<SupplyName, number>;
 
-// What the player chooses each day
-export interface PlayerChoices {
-  price: number;
-  cupsToMake: number;
-}
-
-// What happened at the end of the day
-export interface DayResult {
-  weather: Weather;
-  cupsSold: number;
-  revenue: number;
-  cost: number;
-  profit: number;
-}
+export const SUPPLY_NAMES: SupplyName[] = ["cups", "ice", "lemons", "sugar"];
