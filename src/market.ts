@@ -1,4 +1,4 @@
-import type { Price } from "./types";
+import type { Prices } from "./types";
  
 function randomPrice(min: number, max: number): number {
   return Math.round((min + Math.random() * (max - min)) * 100) / 100;
@@ -6,7 +6,7 @@ function randomPrice(min: number, max: number): number {
  
 export class Market {
   // prices change everyday
-  newPrices(): Price {
+  newPrices(): Prices {
     return {
       cups: randomPrice(0.03, 0.08),
       ice: randomPrice(0.01, 0.04),
