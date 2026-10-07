@@ -23,8 +23,10 @@ export class Inventory{
     }
     return max;
   }
+  //max limits how many cups sold
  
-  // use up ingredients for 'cups' cups
+  // using up ingredients to make lemonade
+  //20 cups, removes 20 cups,40 ice, 5 lemons, 5 sugar
   consume(recipe: Supplies, cups: number): void {
     for (const name of SUPPLY_NAMES) {
       this.items[name] -= recipe[name] * cups;
